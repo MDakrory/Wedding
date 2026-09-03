@@ -62,6 +62,7 @@ a{color:inherit}
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
 }
 #fx{position:fixed;inset:0;z-index:1;pointer-events:none}
+#fx.top{z-index:101}   /* وقت المقدمة فقط: عشان انفجار البتلات يظهر فوق الظرف */
 
 /* ---------- شريط التقدّم ---------- */
 #bar{
@@ -107,21 +108,27 @@ a{color:inherit}
   position:fixed;inset:0;z-index:100;display:grid;place-items:center;
   background:radial-gradient(90vw 70vh at 50% 42%,#FFFCF8 0%,#F8EFE6 46%,#F0E0D3 100%);
   cursor:pointer;-webkit-tap-highlight-color:transparent;
-  transition:opacity 1s var(--ease),transform 1.4s var(--eo),filter 1s;
+  transition:opacity 1.05s var(--ease),transform 1.5s var(--eo),filter 1.05s;
 }
-#veil.gone{opacity:0;transform:scale(1.16);filter:blur(12px);pointer-events:none}
+#veil.gone{opacity:0;transform:scale(1.32);filter:blur(14px);pointer-events:none}
 #veil.hide{display:none}
 .stage{perspective:1300px;perspective-origin:50% 38%;display:grid;place-items:center;padding:18px}
 
+/* كل طبقة مسؤولة عن حركة واحدة — عشان مفيش animation بيلغي التانية */
+.env-in{animation:envIn 1.4s var(--eo) both}
+@keyframes envIn{from{opacity:0;transform:translateY(38px) scale(.9) rotateX(14deg)}to{opacity:1;transform:none}}
+
+.env-bob{animation:envFloat 6s ease-in-out 1.4s infinite;transition:transform 1.6s var(--eo)}
+@keyframes envFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.env-bob.lift{animation:none;transform:translateY(12px) scale(1.02)}
+
 .env{
-  position:relative;width:min(82vw,384px);aspect-ratio:1.5/1;transform-style:preserve-3d;
-  animation:envIn 1.5s var(--eo) both;
+  position:relative;width:min(82vw,384px);aspect-ratio:1.5/1;
+  transform-style:preserve-3d;will-change:transform;
 }
-@keyframes envIn{from{opacity:0;transform:translateY(40px) scale(.88) rotateX(16deg)}to{opacity:1;transform:none}}
-.env-float{animation:envFloat 6s ease-in-out 1.5s infinite}
-@keyframes envFloat{0%,100%{translate:0 0}50%{translate:0 -8px}}
-.env.open{animation:envIn 1.5s var(--eo) both,envLift 1.4s var(--eo) forwards}
-@keyframes envLift{to{transform:translateY(14px) scale(1.04)}}
+/* ارتدادة خفيفة لحظة كسر الختم — حركة لمرة واحدة بترجع لمكانها */
+.env.open{animation:recoil .55s var(--ease)}
+@keyframes recoil{0%{transform:scale(1)}24%{transform:scale(.972)}100%{transform:scale(1)}}
 
 .env-back{
   position:absolute;inset:0;border-radius:8px;
@@ -134,11 +141,16 @@ a{color:inherit}
   border:1px solid rgba(184,127,98,.16);
   box-shadow:0 10px 26px -16px rgba(120,80,60,.55);
   display:grid;place-content:center;gap:7px;text-align:center;
-  transition:transform 1.15s var(--eo);
+  padding-top:20%;   /* يخلّي النص تحت فتحة الظرف فميبانش قبل ما البطاقة تطلع */
+  will-change:transform;
+  transition:transform 1.2s var(--eo) .96s,box-shadow 1.2s ease .96s;
 }
 .env-card b{font-family:var(--f-name);font-weight:700;font-size:clamp(19px,5.4vw,27px);color:var(--rg-1);line-height:1.6}
 .env-card i{font-style:normal;font-size:10px;letter-spacing:.24em;color:var(--ink-3)}
-.env.open .env-card{transform:translateY(-56%) scale(1.05)}
+.env.open .env-card{
+  transform:translateY(-58%) scale(1.04);
+  box-shadow:0 28px 52px -22px rgba(120,80,60,.5);
+}
 
 .env-front{
   position:absolute;inset:0;z-index:3;border-radius:8px;
@@ -154,9 +166,10 @@ a{color:inherit}
   transform-origin:top center;transform-style:preserve-3d;
   background:linear-gradient(180deg,#F0D6CC,#E6C2B7);
   clip-path:polygon(0 0,100% 0,50% 100%);
-  transition:transform 1.05s var(--ease),z-index 0s .48s;
+  will-change:transform;
+  transition:transform 1s var(--ease) .34s,z-index 0s .82s,filter 1s ease .34s;
 }
-.env.open .env-flap{transform:rotateX(-178deg);z-index:1}
+.env.open .env-flap{transform:rotateX(-176deg);z-index:1;filter:brightness(1.06)}
 
 .seal{
   position:absolute;top:40%;left:50%;translate:-50% 0;z-index:6;
@@ -167,7 +180,7 @@ a{color:inherit}
   background:radial-gradient(circle at 34% 28%,#EDC69F 0%,#C68F6C 42%,#A96F4F 72%,#8C593D 100%);
   box-shadow:inset 0 2px 5px rgba(255,236,216,.5),inset 0 -5px 12px rgba(90,50,30,.42),0 8px 20px -8px rgba(120,70,45,.8);
   text-shadow:0 1px 2px rgba(90,50,30,.55);
-  transition:transform .7s var(--eo),opacity .6s,filter .6s;
+  transition:transform .6s var(--eo),opacity .5s ease .06s,filter .5s ease;
 }
 .seal::before{content:"";position:absolute;inset:6px;border-radius:50%;border:1px dashed rgba(255,240,225,.4)}
 .seal::after{
@@ -175,14 +188,17 @@ a{color:inherit}
   animation:ring 2.6s ease-out infinite;
 }
 @keyframes ring{0%{transform:scale(.86);opacity:.8}70%{transform:scale(1.3);opacity:0}100%{opacity:0}}
-.env.open .seal{transform:translate(-50%,-24px) scale(1.6) rotate(18deg);opacity:0;filter:blur(5px)}
+/* ملاحظة: الختم عليه translate:-50% 0 كخاصية مستقلة،
+   فالـ transform هنا لازم يكون رأسي فقط وإلا الختم ينزاح لليسار */
+.env.open .seal{transform:translateY(-30px) scale(1.75) rotate(21deg);opacity:0;filter:blur(6px)}
+.env.open .seal::after{animation:none;opacity:0}
 
 .hint{
   margin:24px 0 0;text-align:center;font-size:12px;letter-spacing:.2em;color:var(--ink-3);
   animation:bob 2.4s ease-in-out infinite;
 }
 @keyframes bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(5px);opacity:1}}
-.stage.opened .hint{opacity:0;transition:opacity .3s}
+.stage.opened .hint{animation:none;opacity:0;transition:opacity .4s}
 
 /* ==========================================================
    التخطيط العام
@@ -227,10 +243,11 @@ h2.title{
   padding-top:56px;padding-bottom:80px;
 }
 .corner{position:absolute;width:min(104px,23vw);height:auto;opacity:.4;pointer-events:none;color:var(--rg-2)}
-.corner circle{fill:currentColor;stroke:none;opacity:0;animation:fadeIn 1s ease 2.6s forwards}
+.corner circle{fill:currentColor;stroke:none;opacity:0}
+.revealed .corner circle{animation:fadeIn 1s ease .9s forwards}
 .corner path{fill:none;stroke:currentColor;stroke-width:.9;stroke-linecap:round;
-  stroke-dasharray:var(--len,420);stroke-dashoffset:var(--len,420);
-  animation:draw 2.6s var(--eo) .5s forwards}
+  stroke-dasharray:var(--len,420);stroke-dashoffset:var(--len,420);}
+.revealed .corner path{animation:draw 2.4s var(--eo) .3s forwards}
 @keyframes draw{to{stroke-dashoffset:0}}
 .c-tr{top:14px;right:10px}
 .c-tl{top:14px;left:10px;transform:scaleX(-1)}
@@ -246,8 +263,8 @@ h2.title{
           mask-image:linear-gradient(to left,#000 44%,transparent 72%);
   -webkit-mask-size:260% 100%;mask-size:260% 100%;
   -webkit-mask-position:0% 0;mask-position:0% 0;
-  animation:unveil 1.9s var(--eo) .35s forwards,sweep 9s linear 2s infinite;
 }
+.revealed .basmala{animation:unveil 1.8s var(--eo) .25s forwards,sweep 9s linear 2s infinite}
 @keyframes unveil{
   from{-webkit-mask-position:0% 0;mask-position:0% 0;filter:blur(7px);opacity:.2}
   to{-webkit-mask-position:100% 0;mask-position:100% 0;filter:blur(0);opacity:1}
@@ -276,32 +293,36 @@ h2.title{
   -webkit-mask-position:0% 0;mask-position:0% 0;
   padding:0 .08em;
 }
-.nm.a{animation:unveil 1.7s var(--eo) 1.2s forwards,sweep 8s linear 3s infinite}
-.nm.b{animation:unveil 1.7s var(--eo) 2s forwards,sweep 8s linear 3.8s infinite}
+.revealed .nm.a{animation:unveil 1.6s var(--eo) .55s forwards,sweep 8s linear 2.2s infinite}
+.revealed .nm.b{animation:unveil 1.6s var(--eo) 1.15s forwards,sweep 8s linear 2.8s infinite}
 .amp{
   display:block;font-family:var(--f-cal);font-size:clamp(26px,7vw,38px);color:var(--rose);
   opacity:0;transform:scale(.4) rotate(-25deg);
-  animation:pop 1s var(--eo) 1.9s forwards;
 }
+.revealed .amp{animation:pop .9s var(--eo) 1.02s forwards}
 @keyframes pop{to{opacity:1;transform:none}}
 .divider{display:block;width:min(230px,62vw);height:20px;margin:6px auto;color:var(--rg-2)}
 .divider path{fill:none;stroke:currentColor;stroke-width:1;stroke-linecap:round;
-  stroke-dasharray:300;stroke-dashoffset:300;animation:draw 2s var(--eo) 2.4s forwards}
-.divider circle{fill:currentColor;stroke:none;opacity:0;animation:fadeIn .8s ease 3.4s forwards}
+  stroke-dasharray:300;stroke-dashoffset:300}
+.revealed .divider path{animation:draw 1.9s var(--eo) 1.5s forwards}
+.divider circle{fill:currentColor;stroke:none;opacity:0}
+.revealed .divider circle{animation:fadeIn .8s ease 2.5s forwards}
 @keyframes fadeIn{to{opacity:.85}}
 
 .when{
   margin:22px 0 0;font-size:clamp(14px,3.9vw,17px);font-weight:500;color:var(--ink-2);
-  letter-spacing:.05em;opacity:0;animation:up 1.1s var(--eo) 2.9s forwards;
+  letter-spacing:.05em;opacity:0;
 }
+.revealed .when{animation:up 1.1s var(--eo) 1.85s forwards}
 .when b{color:var(--rg-1);font-family:var(--f-name);font-weight:700;font-size:1.14em;letter-spacing:0}
 @keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
 .scroll-cue{
   margin-top:38px;display:flex;flex-direction:column;align-items:center;gap:7px;
   font-size:11px;letter-spacing:.24em;color:var(--ink-3);
-  opacity:0;animation:up 1s var(--eo) 3.5s forwards;
+  opacity:0;
 }
+.revealed .scroll-cue{animation:up 1s var(--eo) 2.35s forwards}
 .scroll-cue svg{width:16px;animation:bob 2.2s ease-in-out infinite}
 
 /* شاشات قصيرة: اجعل الافتتاحية شاشة واحدة نظيفة */
@@ -347,13 +368,13 @@ h2.title{
 .reeds{position:absolute;bottom:0;width:min(160px,34vw);height:120px;opacity:.13;pointer-events:none;color:var(--rg-1);z-index:1}
 .reeds.r{right:0}
 .reeds.l{left:0;transform:scaleX(-1)}
-.reeds path{fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;
-  transform-origin:bottom center;animation:sway 7s ease-in-out infinite alternate}
-.reeds path:nth-child(2){animation-duration:8.5s;animation-delay:-1.2s}
-.reeds path:nth-child(3){animation-duration:6.4s;animation-delay:-2.6s}
-.reeds path:nth-child(4){animation-duration:9.2s;animation-delay:-.6s}
-.reeds path:nth-child(5){animation-duration:7.8s;animation-delay:-3.4s}
+.reeds path{fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round}
+/* حركة واحدة على الـ SVG كله بدل حركة لكل ساق — نفس الإحساس بتكلفة أقل */
+.reeds{transform-origin:bottom center;animation:sway 8s ease-in-out infinite alternate}
+.reeds.l{animation-name:swayL;animation-duration:9.5s;animation-delay:-2.4s}
 @keyframes sway{from{transform:rotate(-2.4deg)}to{transform:rotate(2.4deg)}}
+/* المقلوبة أفقياً لازم تحافظ على scaleX(-1) جوه الحركة */
+@keyframes swayL{from{transform:scaleX(-1) rotate(-2.4deg)}to{transform:scaleX(-1) rotate(2.4deg)}}
 
 /* ==========================================================
    ٢) العد التنازلي
@@ -527,6 +548,8 @@ h2.title{
   }
   .rv{opacity:1;transform:none;filter:none}
   .basmala,.nm{-webkit-mask-image:none;mask-image:none;opacity:1}
+  .corner path,.divider path{stroke-dashoffset:0!important}
+  .corner circle,.divider circle{opacity:.85!important}
   .aya .w{opacity:1;transform:none;filter:none}
   .when,.scroll-cue,.amp{opacity:1}
 }
@@ -554,12 +577,16 @@ h2.title{
 <!-- ٠) الظرف -->
 <div id="veil">
   <div class="stage" id="stage">
-    <div class="env env-float" id="env">
-      <div class="env-back"></div>
-      <div class="env-card"><b>محمد &amp; روان</b><i>٠٩ · ١١ · ٢٠٢٦</i></div>
-      <div class="env-front"></div>
-      <div class="env-flap"></div>
-      <button class="seal" id="seal" aria-label="افتح الدعوة">م ر</button>
+    <div class="env-in">
+      <div class="env-bob" id="envBob">
+        <div class="env" id="env">
+          <div class="env-back"></div>
+          <div class="env-card"><b>محمد &amp; روان</b><i>٠٩ · ١١ · ٢٠٢٦</i></div>
+          <div class="env-front"></div>
+          <div class="env-flap"></div>
+          <button class="seal" id="seal" aria-label="افتح الدعوة">م ر</button>
+        </div>
+      </div>
     </div>
     <p class="hint">اضغط على الختم لفتح الدعوة</p>
   </div>
@@ -904,36 +931,54 @@ if(FINE && !RM){
 var veil = document.getElementById("veil"),
     stage = document.getElementById("stage"),
     env = document.getElementById("env"),
+    envBob = document.getElementById("envBob"),
     seal = document.getElementById("seal"),
-    opened = false;
+    opened = false, revealed = false;
 
-function unlock(){
+/* ترتيب المقدمة بالمللي ثانية من لحظة الضغط:
+   0     الختم يتكسّر + انفجار بتلات + ارتدادة خفيفة للظرف
+   340   الغطاء يبدأ ينقلب              (التأخير في الـ CSS)
+   960   البطاقة تبدأ تطلع من الجيب     (التأخير في الـ CSS)
+   1250  رشّة بتلات لحظة خروج البطاقة
+   2200  الظرف يرتفع + الستارة تتلاشى وتكبر + الافتتاحية تبدأ حركتها
+   3700  إخفاء الستارة وإرجاع الكانفس تحت المحتوى                      */
+function reveal(){
+  if(revealed) return; revealed = true;
   document.body.classList.remove("lock");
+  envBob.classList.add("lift");
   veil.classList.add("gone");
-  setTimeout(function(){ veil.classList.add("hide"); }, 1500);
+  document.documentElement.classList.add("revealed");
   startAya();
+  setTimeout(function(){
+    veil.classList.add("hide");
+    cv.classList.remove("top");
+  }, 1500);
 }
 
 function openEnv(){
-  if(opened){ unlock(); return; }
+  if(opened){ reveal(); return; }        /* ضغطة تانية = تخطّي */
   opened = true;
-  env.classList.remove("env-float");
   env.classList.add("open");
   stage.classList.add("opened");
   var r = seal.getBoundingClientRect();
-  burst(r.left + r.width/2, r.top + r.height/2, 46);
-  setTimeout(function(){ burst(window.innerWidth/2, window.innerHeight*.42, 26); }, 620);
-  setTimeout(unlock, 1750);
+  burst(r.left + r.width/2, r.top + r.height/2, 52);
+  setTimeout(function(){
+    var c = env.getBoundingClientRect();
+    burst(c.left + c.width/2, c.top + c.height*.16, 26);
+  }, 1250);
+  setTimeout(reveal, 2200);
 }
 
 if(RM){
   veil.classList.add("hide");
+  document.documentElement.classList.add("revealed");
 } else {
   document.body.classList.add("lock");
+  cv.classList.add("top");
   veil.addEventListener("click", openEnv);
   document.addEventListener("keydown", function(e){
     if(veil.classList.contains("hide")) return;
-    if(e.key === "Enter" || e.key === " " || e.key === "Escape") openEnv();
+    if(e.key === "Enter" || e.key === " " || e.key === "Escape"){ e.preventDefault(); openEnv(); }
   });
 }
 
@@ -1020,7 +1065,7 @@ function setDigits(k, str){
       setTimeout(function(){
         c.cu.textContent = val;
         c.el.classList.remove("go");
-      }, 480);
+      }, 520);   /* بعد نهاية حركة القلب (٥٠٠ms) مش قبلها */
     })(col, ch);
   }
 }
