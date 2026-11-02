@@ -230,7 +230,8 @@ section{
 }
 h2.title{
   font-family:var(--f-cal);font-weight:400;text-align:center;
-  font-size:clamp(27px,7.6vw,42px);line-height:1.5;margin:0 0 40px;
+  font-size:clamp(27px,7.6vw,42px);line-height:1.76;
+  padding-bottom:.18em;margin:0 0 calc(40px - .18em);
   background:var(--gold-t);background-size:220% 100%;
   -webkit-background-clip:text;background-clip:text;color:transparent;
   animation:sweep 9s linear infinite;
@@ -265,7 +266,8 @@ h2.title{
 
 /* البسملة والآية */
 .basmala{
-  font-family:var(--f-quran);font-size:clamp(21px,6.4vw,34px);line-height:2;margin:0 0 26px;
+  font-family:var(--f-quran);font-size:clamp(21px,6.4vw,34px);line-height:2.14;
+  padding-bottom:.14em;margin:0 0 calc(26px - .14em);
   background:var(--gold-t);background-size:260% 100%;
   -webkit-background-clip:text;background-clip:text;color:transparent;
   -webkit-mask-image:linear-gradient(to left,#000 44%,transparent 72%);
@@ -300,7 +302,7 @@ h2.title{
           mask-image:linear-gradient(to left,#000 42%,transparent 74%);
   -webkit-mask-size:280% 100%;mask-size:280% 100%;
   -webkit-mask-position:0% 0;mask-position:0% 0;
-  padding:0 .08em;
+  padding:0 .08em .12em;
 }
 .revealed .nm.a{animation:unveil 1.6s var(--eo) .55s forwards,sweep 8s linear 2.2s infinite}
 .revealed .nm.b{animation:unveil 1.6s var(--eo) 1.15s forwards,sweep 8s linear 2.8s infinite}
@@ -337,7 +339,7 @@ h2.title{
 /* شاشات قصيرة: اجعل الافتتاحية شاشة واحدة نظيفة */
 @media (max-height:790px){
   #home{padding-top:42px;padding-bottom:46px}
-  .basmala{margin-bottom:18px}
+  .basmala{margin-bottom:calc(18px - .14em)}
   .aya{line-height:2.1}
   .src{margin-bottom:24px}
   .lead{margin-bottom:8px}
@@ -425,6 +427,7 @@ h2.title{
 #done{display:none;text-align:center}
 #done.on{display:block;animation:up 1.2s var(--eo) forwards}
 #done p{font-family:var(--f-cal);font-size:clamp(28px,8vw,46px);margin:0;
+  line-height:1.76;padding-bottom:.18em;
   background:var(--gold-t);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;
   color:transparent;animation:sweep 6s linear infinite}
 .rings.off{display:none}
@@ -531,7 +534,9 @@ h2.title{
 .duaa{font-size:14px;color:var(--ink-2);max-width:30ch;margin:34px auto 30px;line-height:2.1}
 .mono-wrap{position:relative;display:inline-block}
 .mono{
-  font-family:var(--f-name);font-weight:700;font-size:clamp(36px,10.4vw,58px);line-height:1.35;
+  display:inline-block;
+  font-family:var(--f-name);font-weight:700;font-size:clamp(36px,10.4vw,58px);line-height:1.6;
+  padding:.06em .08em .3em;
   background:var(--gold-t);background-size:220% 100%;
   -webkit-background-clip:text;background-clip:text;color:transparent;
   animation:sweep 7s linear infinite;
